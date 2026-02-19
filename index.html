@@ -1,52 +1,52 @@
-<html>
-  <head>
-    <style>
-      .mouse{
-        position: absolute;
-        width: 20px;
-        height: 12px;
-        background: grey;
-        border-radius: 10px;
-        left: 100px;
-        right: 100px;
-      }
-      .mouse::before,
-      .mouse::after {
-        content: "";
-        position: absolute;
-        width: 6px;
-        height: 6px;
-        background: gray;
-        border-radius: 50%;
-        top: -3px;
-      }
+<link rel="stylesheet" href="style.css">
 
-      .mouse::before{
-        left: 2px;
-      }
-      .mouse::after{
-        right: 2px;
-      }
-    </style>
-  </head>
-  <body>
-    <button onclick = "mail()">Click this button to blow up planet earth</button>
-    <script>
-      function mail(){
-        const mouse = document.createElement("div");
-        mouse.className = "mouse";
-        document.body.appendChild(mouse);
-        let x = 100;
-        let y = 100;
-        setInterval(() => {
-          x+= (Math.random()-0.5)*30;
-          y+=(Math.random()-0.5)*30;
-          x=Math.max(0, Math.min(window.innerWidth - 20, x));
-          y = Math.max(0, Math.min(window.innerHeight-20, y));
-          mouse.style.left = x+"px";
-          mouse.style.top = y+"px";
-        }, (Math.random()+2)*(Math.random()+2));
-      }
-    </script>
-  </body>
-</html>
+<div class="banner">
+  Video Surveillance Request
+</div>
+
+<div class="main">
+  <div class="form-box">
+    <form id="myForm">
+
+      <input type="text" id="employeeId" placeholder="Employee ID" />
+
+      <input type="text" id="email" placeholder="Email" />
+
+      <input type="text" id="buildingName" placeholder="Building Name" />
+
+      <input type="text" id="reason" placeholder="Reason" />
+
+      <input type="text" id="date" placeholder="Date" />
+
+      <button type="submit">Send</button>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById("myForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    let employeeId = document.getElementById("employeeId").value;
+    let email = document.getElementById("email").value;
+    let buildingName = document.getElementById("buildingName").value;
+    let reason = document.getElementById("reason").value;
+    let date = document.getElementById("date").value;
+
+    let response = await fetch("http://127.0.0.1:5000/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        employeeId: employeeId,
+        email: email,
+        buildingName: buildingName,
+        reason: reason,
+        date: date
+      })
+    });
+
+    let result = await response.json();
+    alert(result.message);
+  });
+</script>
