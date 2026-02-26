@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from auth import authenticate, login_required, role_required, log_action
 from datetime import datetime
 from db import close_db, init_db, get_db
+from auth import authenticate, login_required, role_required, log_action
+
 
 def create_app():
     app = Flask(__name__)
@@ -22,7 +23,7 @@ def create_app():
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if request.method == "POST":
-            email = request.form.get("email", "")
+            email = request.form.get("email", "").strip()
             password = request.form.get("password", "")
 
             user = authenticate(email, password)
@@ -50,9 +51,13 @@ def create_app():
     @app.route("/dashboard")
     @login_required
     def dashboard():
-        return render_template("dashboard.html", name=session.get("name"), role=session.get("role"))
+        return render_template(
+            "dashboard.html",
+            name=session.get("name"),
+            role=session.get("role"),
+        )
 
-    # ---- RBAC test routes (keep inside create_app) ----
+    # ---- RBAC test routes ----
     @app.route("/admin")
     @login_required
     @role_required("admin")
@@ -71,7 +76,7 @@ def create_app():
     def tech_panel():
         return f"Tech panel. Hello {session.get('name')}!"
 
-    return app
+    # ---- Requestor routes ----
     @app.route("/request/new", methods=["GET", "POST"])
     @login_required
     @role_required("requestor", "admin")
@@ -92,6 +97,7 @@ def create_app():
             if not reason:
                 errors.append("Reason is required.")
 
+            # Validate times
             try:
                 start_dt = datetime.fromisoformat(start_time)
                 end_dt = datetime.fromisoformat(end_time)
@@ -108,7 +114,8 @@ def create_app():
             db = get_db()
             cur = db.execute(
                 """
-                INSERT INTO footage_requests (requestor_id, camera_location, start_time, end_time, reason, status)
+                INSERT INTO footage_requests
+                    (requestor_id, camera_location, start_time, end_time, reason, status)
                 VALUES (?, ?, ?, ?, ?, 'Pending')
                 """,
                 (session["user_id"], camera_location, start_time, end_time, reason),
@@ -122,7 +129,6 @@ def create_app():
             return redirect(url_for("my_requests"))
 
         return render_template("new_request.html")
-
 
     @app.route("/requests/mine")
     @login_required
@@ -140,6 +146,10 @@ def create_app():
         ).fetchall()
 
         return render_template("my_requests.html", requests=rows)
+
+    return app
+
+
 app = create_app()
 
 if __name__ == "__main__":
