@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+    <h1>Admin Dashboard</h1>
+    <p>Welcome to the admin dashboard. Here you can manage users, view reports, and perform administrative tasks.</p>
+    <form>
+        <a href="{{url_for('new_request')}}">
+            <button type = "button">New Requests Page</button>
+        </a>
+        <a> 
+            <button type="button">View all requests</button>
+        </a>
+        <a href="{{url_for('all_users')}}">
+            <button type="button">View all users</button>
+        </a>
+        <a href="{{url_for('logout')}}">
+            <button type="button">Logout</button>
+        </a>
+    </form>
+{% endblock %}

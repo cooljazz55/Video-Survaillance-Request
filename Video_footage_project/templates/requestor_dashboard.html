@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Requestor Dashboard{% endblock %}
+{% block content %}
+  <h1>My Requests</h1>
+
+  <a href="{{ url_for('new_request') }}">
+    <button type="button">Submit New Request</button>
+  </a>
+
+  <a href="{{ url_for('logout') }}">
+    <button type="button">Logout</button>
+  </a>
+
+
+  {% if requests %}
+    <table border="1" cellpadding="6">
+      <tr>
+        <th>ID</th>
+        <th>Camera</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Status</th>
+        <th>Submitted</th>
+      </tr>
+      {% for r in requests %}
+      <tr>
+        <td>{{ r["id"] }}</td>
+        <td>{{ r["camera_location"] }}</td>
+        <td>{{ r["start_time"] }}</td>
+        <td>{{ r["end_time"] }}</td>
+        <td>{{ r["status"] }}</td>
+        <td>{{ r["submitted_at"] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p>No requests yet.</p>
+  {% endif %}
+{% endblock %}
