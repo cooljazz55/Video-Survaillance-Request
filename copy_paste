@@ -1,0 +1,68 @@
+
+    @app.route("/admin/all_requests")
+    @login_required
+    @role_required("admin")
+    def all_requests():
+        sort_by = request.args.get("sort_by", "submitted_at")
+        sort_dir = request.args.get("sort_dir", "desc")
+        filter_user_id = request.args.get("user_id", type=int)
+
+        valid_sort_columns = {
+            "id": "r.id",
+            "requestor": "requestor_name",
+            "camera_location": "r.camera_location",
+            "start_time": "r.start_time",
+            "end_time": "r.end_time",
+            "status": "r.status",
+            "submitted_at": "r.submitted_at",
+        }
+
+        if sort_by not in valid_sort_columns:
+            sort_by = "submitted_at"
+        if sort_dir not in ("asc", "desc"):
+            sort_dir = "desc"
+
+        params = []
+        user_filter = ""
+        if filter_user_id:
+            user_filter = "AND r.requestor_id = ?"
+            params.append(filter_user_id)
+
+        db = get_db()
+        requests_rows = db.execute(
+            f"""
+            SELECT
+                r.id,
+                u.first_name || ' ' || u.last_name AS requestor_name,
+                u.email AS requestor_email,
+                r.camera_location,
+                r.start_time,
+                r.end_time,
+                r.reason,
+                r.status,
+                r.submitted_at,
+                r.requestor_id
+            FROM footage_requests r
+            JOIN users u ON r.requestor_id = u.id
+            WHERE r.status != 'Completed' {user_filter}
+            ORDER BY {valid_sort_columns[sort_by]} {sort_dir}
+            """,
+            params,
+        ).fetchall()
+
+        users = db.execute(
+            """
+            SELECT id, first_name || ' ' || last_name AS name
+            FROM users
+            ORDER BY first_name, last_name
+            """
+        ).fetchall()
+
+        return render_template(
+            "all_requests.html",
+            requests=requests_rows,
+            users=users,
+            selected_user_id=filter_user_id,
+            sort_by=sort_by,
+            sort_dir=sort_dir,
+        )
