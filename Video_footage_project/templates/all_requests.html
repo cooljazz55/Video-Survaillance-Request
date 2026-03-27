@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}All Requests{% endblock %}
+{% block content %}
+    <h1>All Active Requests</h1>
+
+    <div class="toolbar">
+        <button id="filter-by-btn" type="button">Filter by ▾</button>
+        <div id="filter-menu" class="dropdown-menu hidden">
+            <button id="filter-by-users-btn" type="button">Users ▸</button>
+        </div>
+        <div id="user-filter-menu" class="dropdown-menu hidden">
+            {% for user in users %}
+                <a href="{{ url_for('all_requests', user_id=user.id, sort_by=sort_by, sort_dir=sort_dir) }}">{{ user.name }}</a>
+            {% endfor %}
+            <a href="{{ url_for('all_requests', sort_by=sort_by, sort_dir=sort_dir) }}">Show all users</a>
+        </div>
+    </div>
+
+    <p>
+        {% if selected_user_id %}
+            <strong>Filtered by user:</strong>
+            {{ users | selectattr('id','equalto',selected_user_id) | map(attribute='name') | list | first or 'Unknown' }}
+            (<a href="{{ url_for('all_requests') }}">clear</a>)
+        {% endif %}
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                {% macro sort_link(column, label) %}
+                    {% set toggle = 'asc' if sort_by != column or sort_dir == 'desc' else 'desc' %}
+                    <a href="{{ url_for('all_requests', sort_by=column, sort_dir=toggle, user_id=selected_user_id) }}">{{ label }}
+                        {% if sort_by == column %}
+                            {{ '↑' if sort_dir == 'asc' else '↓' }}
+                        {% endif %}
+                    </a>
+                {% endmacro %}
+                <th>{{ sort_link('id', 'ID') }}</th>
+                <th>{{ sort_link('requestor', 'Requestor') }}</th>
+                <th>{{ sort_link('camera_location', 'Camera') }}</th>
+                <th>{{ sort_link('start_time', 'Start Time') }}</th>
+                <th>{{ sort_link('end_time', 'End Time') }}</th>
+                <th>{{ sort_link('status', 'Status') }}</th>
+                <th>{{ sort_link('submitted_at', 'Submitted At') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requests %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.requestor_name }}<br><small>{{ r.requestor_email }}</small></td>
+                <td>{{ r.camera_location }}</td>
+                <td>{{ r.start_time }}</td>
+                <td>{{ r.end_time }}</td>
+                <td>{{ r.status }}</td>
+                <td>{{ r.submitted_at }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">No active requests found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('admin_dashboard') }}">
+        <button type="button">Go Back</button>
+    </a>
+    
+    <style>
+        .toolbar { margin-bottom: 12px; position: relative; }
+        .dropdown-menu { position: absolute; background: white; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.12); padding: 4px; z-index: 10; }
+        .hidden { display: none; }
+        .dropdown-menu a, .dropdown-menu button { display: block; width: 100%; padding: 4px 8px; text-align: left; border: none; background: none; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th a { text-decoration: none; color: inherit; }
+    </style>
+
+    <script>
+        const filterByBtn = document.getElementById('filter-by-btn');
+        const filterMenu = document.getElementById('filter-menu');
+        const filterByUsersBtn = document.getElementById('filter-by-users-btn');
+        const userFilterMenu = document.getElementById('user-filter-menu');
+
+        filterByBtn.addEventListener('click', function() {
+            filterMenu.classList.toggle('hidden');
+            userFilterMenu.classList.add('hidden');
+        });
+        filterByUsersBtn.addEventListener('click', function() {
+            userFilterMenu.classList.toggle('hidden');
+            setUserMenu();
+        });
+        document.addEventListener('click', function(e){
+            if (!filterByBtn.contains(e.target) && !filterMenu.contains(e.target) && !userFilterMenu.contains(e.target)) {
+                filterMenu.classList.add('hidden');
+                userFilterMenu.classList.add('hidden');
+            }
+        });
+    </script>
+{% endblock %}

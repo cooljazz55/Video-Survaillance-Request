@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Director Dashboard{% endblock %}
+
+{% block content %}
+  <h1>Requests Pending Approval</h1>
+
+  {% if requests %}
+    <table border="1" cellpadding="6">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Camera</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Status</th>
+        <th>Submitted</th>
+        <th>Action</th>
+      </tr>
+
+      {% for r in requests %}
+      <tr>
+        <td>{{ r["id"] }}</td>
+        <td>{{ r["first_name"] }} {{ r["last_name"] }}</td>
+        <td>{{ r["camera_location"] }}</td>
+        <td>{{ r["start_time"] }}</td>
+        <td>{{ r["end_time"] }}</td>
+        <td>
+          <span class="status-{{ r['status']|lower }}">
+            {{ r["status"] }}
+          </span>
+        </td>
+        <td>{{ r["submitted_at"] }}</td>
+        <td>
+          {% if r["status"] == "Pending" %}
+            <form method="post" action="{{ url_for('update_request_status', request_id=r['id']) }}" style="display:inline;">
+              <button type="submit" name="action" value="approve">
+                Approve
+              </button>
+            </form>
+
+            <form method="post" action="{{ url_for('update_request_status', request_id=r['id']) }}" style="display:inline;">
+              <button type="submit" name="action" value="decline">
+                Deny
+              </button>
+            </form>
+          {% else %}
+            <span>Reviewed</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p>No requests yet.</p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}New Footage Request{% endblock %}
+
+{% block content %}
+  <h1>Submit Footage Request</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul>
+        {% for category, msg in messages %}
+          <li><strong>{{ category }}:</strong> {{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="post">
+    <label>Camera Location</label><br/>
+    <input type="text" name="camera_location" required /><br/><br/>
+
+    <label>Start Time</label><br/>
+    <input type="datetime-local" name="start_time" required /><br/><br/>
+
+    <label>End Time</label><br/>
+    <input type="datetime-local" name="end_time" required /><br/><br/>
+
+    <label>Reason</label><br/>
+    <textarea name="reason" rows="4" cols="40" required></textarea><br/><br/>
+
+    <button type="submit">Submit</button>
+  </form>
+  <a href="{{ url_for('requestor_dashboard') }}">
+    <button type="button">Go Back</button>
+  </a>
+{% endblock %}

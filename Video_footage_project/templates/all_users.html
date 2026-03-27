@@ -1,0 +1,56 @@
+{%extends "base.html"%}
+{%block title%}All Users{%endblock%}
+{%block content%}
+    <h1>All Users</h1>
+    <div>
+        <a>Click on a user ID to go to their dashboard</a>
+    </div>
+    {%if users%}
+        <table border="1" cellpadding="6">
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Role</th>
+                <th>Is Active</th>
+                <th>Created at</th>
+                <th>User ID</th>
+                <th>Actions</th>
+            </tr>
+            {% for r in users %}
+                {% if r["role"] == 'requestor' %}
+                    {% set goto_link='requestor_dashboard' %}
+                {% elif r["role"] == 'director' %}
+                    {% set goto_link = 'director_dashboard' %}
+                {% else %}
+                    {% set goto_link = 'tech_dashboard' %}
+                {% endif %}
+                <tr>
+                    <td>{{r["first_name"]}}</td>
+                    <td>{{r["last_name"]}}</td>
+                    <td>{{r["email"]}}</td>
+                    <td>{{r["department"]}}</td>
+                    <td>{{r["role"]}}</td>
+                    <td>{{r["is_active"]}}</td>
+                    <td>{{r["created_at"]}}</td>
+                    <td>
+                        <a href="{{url_for(goto_link)}}">
+                            <button type="button">{{r["id"]}}</button>
+                        </a>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('delete_user', user_id=r['id']) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {%else%}
+        <p>No active users</p>
+    {%endif%}
+    <a href="{{url_for('admin_dashboard')}}">
+        <button type="button">Go Back</button>
+    </a>
+{%endblock%}

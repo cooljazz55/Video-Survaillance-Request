@@ -1,0 +1,96 @@
+/* This centers everything and adds a background color */
+body {
+    /*
+    background-image: url('/static/img/banner.jpg');
+    */
+    background-color: rgb(196, 243, 255);
+    background-position: center;
+    font-family: Arial, sans-serif;
+    display: flex;
+    
+    justify-content: center;
+    
+    height: 100vh;
+    margin: 0;
+}
+
+/* This makes your login box look like a clean white card */
+form {
+    background: rgb(240, 235, 240);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+button {
+    display: block;
+    background-color: aquamarine;
+    margin-block: 8px;
+}
+
+/* Improved table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    margin-top: 14px;
+    background-color: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+th, td {
+    padding: 10px 12px;
+    border: 1px solid #eaeaea;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+th {
+    background: linear-gradient(180deg, #f2f7ff 0%, #e8f0ff 100%);
+    color: #2c3e50;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #fcfdff;
+}
+
+tbody tr:hover {
+    background-color: #ecf4ff;
+}
+
+.button, button {
+    border: 1px solid #68c5db;
+    border-radius: 4px;
+    color: #2a505f;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+button:hover, .button:hover {
+    background-color: #a9f3dc;
+    transform: translateY(-1px);
+}
+
+.delete-btn {
+    background-color: #ff9999;
+    border: 1px solid #e65c5c;
+    color: #7b1f1f;
+}
+
+.delete-btn:hover {
+    background-color: #ff7878;
+    transform: translateY(-1px);
+}
+
+h1 {
+    padding: 10px;
+    border-radius: 4px;
+    /*text-align: center;
+    background-position: top;
+    background-color: #94e37e;
+    
+    */
+}
