@@ -47,6 +47,18 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   FOREIGN KEY (request_id) REFERENCES footage_requests(id)
 );
 
+CREATE TABLE IF NOT EXISTS footage_deliveries (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  request_id INTEGER NOT NULL,
+  provided_at TEXT NOT NULL DEFAULT (datetime('now')),
+  technician_name TEXT NOT NULL,
+  technician_employee_id TEXT NOT NULL,
+  folder_password TEXT NOT NULL,
+  footage_location TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (request_id) REFERENCES footage_requests(id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_requests_requestor ON footage_requests(requestor_id);
 CREATE INDEX IF NOT EXISTS idx_requests_status ON footage_requests(status);
 CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_logs(user_id);
