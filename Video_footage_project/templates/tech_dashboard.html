@@ -15,27 +15,86 @@
 
 
   {% if requests %}
-    <table border="1" cellpadding="6">
-      <tr>
-        <th>ID</th>
-        <th>Camera</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Status</th>
-        <th>Submitted</th>
-      </tr>
+    <table class="nice-table" data-role="tech-requests">
+      <thead>
+        <tr>
+          <th><a href="{{ url_for('tech_dashboard', sort_by='id', sort_dir='asc' if sort_by!='id' or sort_dir=='desc' else 'desc') }}">ID{% if sort_by=='id' %} {{ '↑' if sort_dir=='asc' else '↓' }}{% endif %}</a></th>
+          <th><a href="{{ url_for('tech_dashboard', sort_by='camera_location', sort_dir='asc' if sort_by!='camera_location' or sort_dir=='desc' else 'desc') }}">Camera{% if sort_by=='camera_location' %} {{ '↑' if sort_dir=='asc' else '↓' }}{% endif %}</a></th>
+          <th><a href="{{ url_for('tech_dashboard', sort_by='start_time', sort_dir='asc' if sort_by!='start_time' or sort_dir=='desc' else 'desc') }}">Start{% if sort_by=='start_time' %} {{ '↑' if sort_dir=='asc' else '↓' }}{% endif %}</a></th>
+          <th><a href="{{ url_for('tech_dashboard', sort_by='end_time', sort_dir='asc' if sort_by!='end_time' or sort_dir=='desc' else 'desc') }}">End{% if sort_by=='end_time' %} {{ '↑' if sort_dir=='asc' else '↓' }}{% endif %}</a></th>
+          <th>Status</th>
+          <th><a href="{{ url_for('tech_dashboard', sort_by='submitted_at', sort_dir='asc' if sort_by!='submitted_at' or sort_dir=='desc' else 'desc') }}">Submitted{% if sort_by=='submitted_at' %} {{ '↑' if sort_dir=='asc' else '↓' }}{% endif %}</a></th>
+          <th>Requestor</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
       {% for r in requests %}
-      <tr>
-        <td>{{ r["id"] }}</td>
-        <td>{{ r["camera_location"] }}</td>
-        <td>{{ r["start_time"] }}</td>
-        <td>{{ r["end_time"] }}</td>
-        <td>{{ r["status"] }}</td>
-        <td>{{ r["submitted_at"] }}</td>
+      <tr class="request-row" data-request-id="{{ r['id'] }}">
+        <td>{{ r['id'] }}</td>
+        <td>{{ r['camera_location'] }}</td>
+        <td>{{ r['start_time'] }}</td>
+        <td>{{ r['end_time'] }}</td>
+        <td>{{ r['status'] }}</td>
+        <td>{{ r['submitted_at'] }}</td>
+        <td>{{ r['requestor_name'] }}<br><small>{{ r['requestor_email'] }}</small></td>
+        <td><button type="button" class="toggle-form" data-target="form-{{r['id']}}">Add delivery data</button></td>
+      </tr>
+      <tr id="form-{{ r['id'] }}" class="request-form hidden">
+        <td colspan="8">
+          <form method="post" action="{{ url_for('submit_delivery', request_id=r['id']) }}">
+            <div>
+              <label>Technician Name</label><br>
+              <input type="text" name="technician_name" value="{{ session['name'] }}" required>
+            </div>
+            <div>
+              <label>Technician Employee ID</label><br>
+              <input type="text" name="technician_employee_id" value="{{ session['user_id'] }}" required>
+            </div>
+            <div>
+              <label>Folder Password</label><br>
+              <input type="text" name="folder_password" required>
+            </div>
+            <div>
+              <label>Video Surveillance Footage Location (network share)</label><br>
+              <input type="text" name="footage_location" required>
+            </div>
+            <div>
+              <button type="submit">Submit Delivery Info</button>
+            </div>
+          </form>
+        </td>
       </tr>
       {% endfor %}
+      </tbody>
     </table>
   {% else %}
-    <p>No requests yet.</p>
+    <p>No approved requests for your department.</p>
   {% endif %}
+{% endblock %}
+
+{% block head %}
+<style>
+  .hidden { display: none; }
+  .request-form td { background: #f8f9fb; }
+  .nice-table { width: 100%; border-collapse: collapse; }
+  .nice-table th, .nice-table td { border: 1px solid #d7dbe1; padding: 8px; }
+  .nice-table th { background: #edf2fb; }
+  .toggle-form { padding: 4px 8px; }
+  .request-form input[type=text] { width: 100%; margin: 4px 0 10px; padding: 6px; }
+  .request-form button[type=submit] { display: inline-block; margin-top: 8px; padding: 8px 12px; }
+</style>
+{% endblock %}
+
+{% block script %}
+<script>
+document.querySelectorAll('.toggle-form').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var target = document.getElementById(btn.dataset.target);
+    if (target) {
+      target.classList.toggle('hidden');
+    }
+  });
+});
+</script>
 {% endblock %}
