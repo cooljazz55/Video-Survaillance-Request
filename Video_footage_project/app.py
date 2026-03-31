@@ -1,11 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, app, render_template, request, redirect, url_for, session, flash
 from datetime import datetime
 from db import close_db, init_db, get_db
 from auth import authenticate, login_required, role_required, log_action
 from werkzeug.security import generate_password_hash
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-from email_sender import initial_email_to_employee, send_update_email, send_tech_email
+from email_sender import initial_email_to_employee, send_update_email, send_tech_email, send_final_email
 
 def create_app():
     app = Flask(__name__)
@@ -51,6 +49,12 @@ def create_app():
                 return redirect(url_for("requestor_dashboard"))
         return render_template("login.html")
     
+    @app.route("/admin/dashboard")
+    @login_required
+    @role_required("admin")
+    def admin_dashboard():
+        return render_template("admin_dashboard.html")
+
     @app.route("/admin/all_users")
     @login_required
     @role_required("admin")
@@ -65,12 +69,6 @@ def create_app():
         ).fetchall()
         return render_template("all_users.html", users=rows)
 
-    @app.route("/admin/delete_user/<int:user_id>", methods=["POST"])
-    @login_required
-    @role_required("admin")
-    def delete_user(user_id):
-        return redirect(url_for("all_users"))
-    
     @app.route("/admin/all_requests")
     @login_required
     @role_required("admin")
@@ -139,17 +137,93 @@ def create_app():
             sort_dir=sort_dir,
         )
 
-    @app.route("/admin/dashboard")
+    @app.route("/admin/delete_user/<int:user_id>", methods=["POST"])
     @login_required
     @role_required("admin")
-    def admin_dashboard():
-        return render_template("admin_dashboard.html")
-    
+    def delete_user(user_id):
+        return redirect(url_for("all_users"))
+
     @app.route("/tech/dashboard")
     @login_required
     @role_required("admin", "tech")
     def tech_dashboard():
-        return render_template("tech_dashboard.html")
+        sort_by = request.args.get("sort_by", "submitted_at")
+        sort_dir = request.args.get("sort_dir", "desc")
+
+        valid_sort_columns = {
+            "id": "fr.id",
+            "camera_location": "fr.camera_location",
+            "start_time": "fr.start_time",
+            "end_time": "fr.end_time",
+            "status": "fr.status",
+            "submitted_at": "fr.submitted_at",
+        }
+
+        if sort_by not in valid_sort_columns:
+            sort_by = "submitted_at"
+        if sort_dir not in ("asc", "desc"):
+            sort_dir = "desc"
+
+        db = get_db()
+        user = db.execute("SELECT department FROM users WHERE id = ?", (session.get("user_id"),)).fetchone()
+        department = user["department"] if user else None
+
+        rows = []
+        if department:
+            rows = db.execute(
+                f"""
+                SELECT
+                    fr.id,
+                    fr.camera_location,
+                    fr.start_time,
+                    fr.end_time,
+                    fr.status,
+                    fr.submitted_at,
+                    u.first_name || ' ' || u.last_name AS requestor_name,
+                    u.email AS requestor_email,
+                    fr.reason
+                FROM footage_requests fr
+                JOIN users u ON fr.requestor_id = u.id
+                WHERE fr.status = 'Approved' AND u.department = ?
+                ORDER BY {valid_sort_columns[sort_by]} {sort_dir}
+                """,
+                (department,),
+            ).fetchall()
+
+        return render_template("tech_dashboard.html", requests=rows, sort_by=sort_by, sort_dir=sort_dir, department=department)
+
+    @app.route("/tech/request/<int:request_id>/submit_delivery", methods=["POST"])
+    @login_required
+    @role_required("tech", "admin")
+    def submit_delivery(request_id):
+        technician_name = request.form.get("technician_name", "").strip()
+        technician_employee_id = request.form.get("technician_employee_id", "").strip()
+        folder_password = request.form.get("folder_password", "").strip()
+        footage_location = request.form.get("footage_location", "").strip()
+
+        if not all([technician_name, technician_employee_id, folder_password, footage_location]):
+            flash("All fields are required.", "error")
+            return redirect(url_for("tech_dashboard"))
+
+        db = get_db()
+        req = db.execute(
+            "SELECT fr.id FROM footage_requests fr JOIN users u ON fr.requestor_id = u.id WHERE fr.id = ? AND fr.status='Approved' AND u.department = ?",
+            (request_id, session.get("department")),
+        ).fetchone()
+        if not req:
+            flash("Request not available for this tech.", "error")
+            return redirect(url_for("tech_dashboard"))
+
+        db.execute(
+            "INSERT INTO footage_deliveries (request_id, technician_name, technician_employee_id, folder_password, footage_location) VALUES (?, ?, ?, ?, ?)",
+            (request_id, technician_name, technician_employee_id, folder_password, footage_location),
+        )
+        db.execute("UPDATE footage_requests SET status = 'Completed', tech_id = ? WHERE id = ?", (session.get("user_id"), request_id))
+        db.commit()
+
+        send_final_email(request_id)
+        flash("Footage delivery details saved successfully.", "success")
+        return redirect(url_for("tech_dashboard"))
 
     @app.route("/create-account", methods=["GET", "POST"])
     def create_account():
