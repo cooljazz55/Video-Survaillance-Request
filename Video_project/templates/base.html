@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}City of Laredo Portal{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #1f2937;
+        }
+
+        .top-strip {
+            height: 8px;
+            background: #041981;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #d9dee5;
+        }
+
+        .header-inner {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 18px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .login-header .header-inner {
+            justify-content: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .brand img {
+            height: 68px;
+            width: auto;
+            display: block;
+        }
+
+        .brand-divider {
+            width: 1px;
+            height: 58px;
+            background: #d7dce2;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .brand-kicker {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .brand-title {
+            font-size: 31px;
+            font-weight: 700;
+            color: #17375e;
+            line-height: 1.1;
+        }
+
+        .brand-subtitle {
+            font-size: 14px;
+            color: #4b5563;
+            margin-top: 4px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #17375e;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .nav a:hover {
+            background: #eef2ff;
+            color: #041981;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-toggle {
+            background: #eef2ff;
+            color: #041981;
+            border: 1px solid #cfd8ff;
+            padding: 9px 14px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .user-toggle:hover {
+            background: #dfe7ff;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 46px;
+            background: white;
+            border: 1px solid #d9dee5;
+            border-radius: 8px;
+            min-width: 180px;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 14px;
+            text-decoration: none;
+            color: #17375e;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f4f6f8;
+            color: #041981;
+        }
+
+        .user-menu.open .dropdown-menu {
+            display: block;
+        }
+
+        .banner {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            background: #dfe6ee;
+            border-bottom: 1px solid #d9dee5;
+        }
+
+        .banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .page-shell {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 26px 28px 40px;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        .login-page {
+            min-height: calc(100vh - 120px);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 60px 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
+        }
+
+        h1, h2, h3 {
+            color: #17375e;
+        }
+
+        button {
+            background: #041981;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background: #02145f;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .muted-button {
+            background: #dcdfe5;
+            color: #333;
+        }
+
+        .muted-button:hover {
+            background: #cfd4dc;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cfd6df;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #041981;
+            box-shadow: 0 0 0 3px rgba(4, 25, 129, 0.12);
+        }
+
+        label {
+            font-weight: 700;
+            color: #17375e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        th {
+            background: #17375e;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        tr:hover td {
+            background: #f9fafb;
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 0;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 9px 18px;
+            text-decoration: none;
+            border: 1px solid #17375e;
+            background: white;
+            color: #17375e;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .filter-btn:not(:last-child) {
+            border-right: none;
+        }
+
+        .filter-btn:first-child {
+            border-radius: 6px 0 0 6px;
+        }
+
+        .filter-btn:last-child {
+            border-radius: 0 6px 6px 0;
+        }
+
+        .filter-btn:hover {
+            background: #eef2ff;
+            color: #041981;
+        }
+
+        .filter-btn.active {
+            background: #17375e;
+            color: white;
+        }
+
+        .section-title {
+            margin-bottom: 6px;
+        }
+
+        .section-subtitle {
+            color: #6b7280;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #842029;
+            border: 1px solid #f1aeb5;
+        }
+
+        .portal-login-card {
+            width: 380px;
+            max-width: 100%;
+            padding: 30px 28px;
+        }
+
+        .portal-login-title {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 22px;
+            font-size: 34px;
+            color: #17375e;
+        }
+
+        .portal-footer-space {
+            height: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .login-header .header-inner {
+                align-items: center;
+            }
+
+            .brand-title {
+                font-size: 24px;
+            }
+
+            .brand img {
+                height: 58px;
+            }
+
+            .banner {
+                height: 130px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-inner,
+            .page-shell {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .brand {
+                gap: 12px;
+            }
+
+            .brand-divider {
+                display: none;
+            }
+
+            .brand-title {
+                font-size: 21px;
+            }
+
+            .brand-subtitle {
+                font-size: 13px;
+            }
+
+            .nav {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            th, td {
+                font-size: 13px;
+            }
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+    <div class="top-strip"></div>
+
+    <header class="header {% if request.endpoint == 'login' %}login-header{% endif %}">
+        <div class="header-inner">
+            <div class="brand">
+                <img src="{{ url_for('static', filename='img/laredo_logo.png') }}" alt="City of Laredo Logo">
+
+                <div class="brand-divider"></div>
+
+                <div class="brand-text">
+                    <div class="brand-kicker">City of Laredo, Texas</div>
+                    <div class="brand-title">Video Footage Request Portal</div>
+                    <div class="brand-subtitle">Internal Request and Access Management System</div>
+                </div>
+            </div>
+
+            {% if request.endpoint != 'login' %}
+            <nav class="nav">
+                {% if current_user %}
+                    <a href="{{ url_for('home') }}">Home</a>
+
+                    <div class="user-menu" id="userMenu">
+                        <button class="user-toggle" type="button" onclick="toggleUserMenu()">
+                            {{ current_user["first_name"] }}
+                        </button>
+
+                        <div class="dropdown-menu">
+                            <a href="{{ url_for('account_details') }}">Account</a>
+                            <a href="{{ url_for('logout') }}">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('create_account') }}">Create Account</a>
+                {% endif %}
+            </nav>
+            {% endif %}
+        </div>
+    </header>
+
+    {% if request.endpoint != 'login' %}
+    <div class="banner">
+        <img src="{{ url_for('static', filename='img/banner.jpg') }}" alt="Banner">
+    </div>
+    {% endif %}
+
+    <div class="{% block container_class %}page-shell container{% endblock %}">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        function toggleUserMenu() {
+            const menu = document.getElementById("userMenu");
+            if (menu) menu.classList.toggle("open");
+        }
+
+        window.addEventListener("click", function(event) {
+            const menu = document.getElementById("userMenu");
+            if (menu && !menu.contains(event.target)) {
+                menu.classList.remove("open");
+            }
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

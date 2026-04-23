@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+  <h1>Welcome, {{ name }}!</h1>
+  <p>Your role: <strong>{{ role }}</strong></p>
+
+  <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+    {% if role == "requestor" %}
+      <a href="{{ url_for('requestor_dashboard') }}">
+        <button type="button">My Requests</button>
+      </a>
+
+      <a href="{{ url_for('new_request') }}">
+        <button type="button">Submit Request</button>
+      </a>
+    {% endif %}
+
+    {% if role == "director" %}
+      <a href="{{ url_for('director_dashboard') }}">
+        <button type="button">Review Requests</button>
+      </a>
+    {% endif %}
+
+    {% if role == "tech" %}
+      <a href="{{ url_for('tech_dashboard') }}">
+        <button type="button">Tech Dashboard</button>
+      </a>
+    {% endif %}
+
+    {% if role == "admin" %}
+      <a href="{{ url_for('admin_dashboard') }}">
+        <button type="button">Admin Panel</button>
+      </a>
+
+      <a href="{{ url_for('all_users') }}">
+        <button type="button">Manage Users</button>
+      </a>
+
+      <a href="{{ url_for('all_requests') }}">
+        <button type="button">View Requests</button>
+      </a>
+    {% endif %}
+
+  </div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Account Details{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h1>Account Details</h1>
+
+    <p><strong>Employee ID:</strong> {{ user["employee_id"] or "—" }}</p>
+    <p><strong>Name:</strong> {{ user["first_name"] }} {{ user["last_name"] }}</p>
+    <p><strong>Email:</strong> {{ user["email"] }}</p>
+    <p><strong>Role:</strong> {{ user["role"] }}</p>
+    <p><strong>Department:</strong> {{ user["department"] or "—" }}</p>
+    <p><strong>Division:</strong> {{ user["division"] or "—" }}</p>
+    <p><strong>Job Title:</strong> {{ user["job_title"] or "—" }}</p>
+    <p><strong>Account Created:</strong> {{ user["created_at"] }}</p>
+  </div>
+{% endblock %}

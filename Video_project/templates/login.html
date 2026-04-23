@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block container_class %}login-page{% endblock %}
+
+{% block content %}
+
+<div class="card" style="width: 320px;">
+  <h2 style="text-align:center; margin-bottom: 15px;">Login</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div style="margin-bottom: 15px;">
+        {% for category, msg in messages %}
+          <div style="
+            background:#f8d7da;
+            color:#842029;
+            padding:8px;
+            border-radius:5px;
+            font-size:14px;
+            margin-bottom:5px;
+          ">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST">
+    
+    <div style="margin-bottom: 12px;">
+      <label style="font-weight: 600;">Email</label><br>
+      <input type="email" name="email" required
+             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label style="font-weight: 600;">Password</label><br>
+      <input type="password" name="password" required
+             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
+    </div>
+
+    <!-- BUTTON WITH YOUR COLOR -->
+    <button type="submit" style="width:100%; background:#041981; color:white;">
+      Login
+    </button>
+
+  </form>
+
+  <div style="margin-top: 15px; text-align:center;">
+    <a href="{{ url_for('create_account') }}" style="color:#041981; font-weight:600;">
+      Create an account
+    </a>
+  </div>
+</div>
+
+{% endblock %}

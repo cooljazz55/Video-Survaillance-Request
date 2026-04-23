@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Create Account{% endblock %}
+
+{% block content %}
+  <h1>City of Laredo – Account Creation</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul>
+        {% for category, msg in messages %}
+          <li><strong>{{ category }}:</strong> {{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="post">
+    <label for="employee_id">Employee ID</label><br/>
+    <input type="text" id="employee_id" name="employee_id" required /><br/><br/>
+
+    <label for="first_name">First Name</label><br/>
+    <input type="text" id="first_name" name="first_name" required /><br/><br/>
+
+    <label for="last_name">Last Name</label><br/>
+    <input type="text" id="last_name" name="last_name" required /><br/><br/>
+
+    <label for="email">Email</label><br/>
+    <input type="email" id="email" name="email" required /><br/><br/>
+
+    <label for="password">Password</label><br/>
+    <input type="password" id="password" name="password" required /><br/><br/>
+
+    <label for="department">Department</label><br/>
+    <select id="department" name="department" required>
+      <option value="">Select Department</option>
+      <option value="Public Safety">Public Safety</option>
+      <option value="Transportation">Transportation</option>
+      <option value="Utilities">Utilities</option>
+    </select><br/><br/>
+
+    <label for="division">Division</label><br/>
+    <input type="text" id="division" name="division" required /><br/><br/>
+
+    <label for="job_title">Job Title</label><br/>
+    <input type="text" id="job_title" name="job_title" required /><br/><br/>
+
+    <label for="role">Role</label><br/>
+    <select id="role" name="role" required>
+      <option value="requestor">Employee</option>
+    </select>
+    <br/>
+    <small style="color: gray;">
+      Only employee requestor accounts can be created here. Director, technician, and admin accounts are managed internally.
+    </small>
+    <br/><br/>
+
+    <button type="submit">Create Account</button>
+  </form>
+{% endblock %}

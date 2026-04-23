@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}All Requests{% endblock %}
+
+{% block content %}
+  <h1>All Requests</h1>
+
+  <p>Admin view of all submitted requests.</p>
+
+  {% if requests %}
+    <table border="1" cellpadding="6">
+      <tr>
+        <th>ID</th>
+        <th>Requestor</th>
+        <th>Email</th>
+        <th>Camera</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Reason</th>
+        <th>Status</th>
+        <th>Submitted</th>
+      </tr>
+
+      {% for r in requests %}
+      <tr>
+        <td>{{ r["id"] }}</td>
+        <td>{{ r["requestor_name"] }}</td>
+        <td>{{ r["requestor_email"] }}</td>
+        <td>{{ r["camera_location"] }}</td>
+        <td>{{ r["start_time"] | pretty_datetime }}</td>
+        <td>{{ r["end_time"] | pretty_datetime }}</td>
+        <td>{{ r["reason"] }}</td>
+        <td>{{ r["status"] }}</td>
+        <td>{{ r["submitted_at"] | pretty_datetime }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p>No requests found.</p>
+  {% endif %}
+
+  <br>
+  <a href="{{ url_for('admin_dashboard') }}">
+    <button type="button">Go Back</button>
+  </a>
+{% endblock %}

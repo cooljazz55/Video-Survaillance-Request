@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Director Dashboard{% endblock %}
+
+{% block content %}
+
+<h1 style="margin-bottom: 5px;">Director Dashboard</h1>
+<p style="color: gray; margin-top: 0;">Manage and review footage requests</p>
+
+<!-- FILTER BAR (USES BASE STYLE) -->
+<div class="filter-container">
+  {% set statuses = ['All', 'Pending', 'Approved', 'Denied'] %}
+  
+  {% for status in statuses %}
+    <a href="{{ url_for('director_dashboard', status=status) }}" 
+       class="filter-btn {% if selected_status == status %}active{% endif %}">
+      {{ status }}
+    </a>
+  {% endfor %}
+</div>
+
+<p>Showing: <strong>{{ selected_status }}</strong></p>
+
+{% if requests %}
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Employee</th>
+      <th>Department</th>
+      <th>Location</th>
+      <th>Start / End Time</th>
+      <th>Reason</th>
+      <th>Status</th>
+      <th>Comment</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for r in requests %}
+    <tr>
+      <td>{{ r.id }}</td>
+
+      <td>
+        <strong>{{ r.first_name }} {{ r.last_name }}</strong><br>
+        <small>{{ r.email }}</small>
+      </td>
+
+      <td>{{ r.department }}</td>
+
+      <td>
+        {{ r.building }}<br>
+        <small>Cam: {{ r.camera_location }}</small>
+      </td>
+
+      <td>
+        <small>S: {{ r.start_time | pretty_datetime }}</small><br>
+        <small>E: {{ r.end_time | pretty_datetime }}</small>
+      </td>
+
+      <td>{{ r.reason }}</td>
+
+      <!-- STATUS (MATCH BASE COLORS) -->
+      <td>
+        {% if r.status == "Approved" %}
+          <span style="color: #041981; font-weight: bold;">Approved</span>
+        {% elif r.status == "Denied" %}
+          <span style="color: #a94442; font-weight: bold;">Denied</span>
+        {% elif r.status == "Completed" %}
+          <span style="color: #041981; font-weight: bold;">Completed</span>
+        {% else %}
+          <span style="color: #041981; font-weight: bold;">Pending</span>
+        {% endif %}
+      </td>
+
+      <td>{{ r.director_comment or "-" }}</td>
+
+      <td>
+        {% if r.status == "Pending" %}
+        <form method="POST" action="{{ url_for('update_request_status', request_id=r.id) }}">
+          
+          <input type="text" name="director_comment" class="action-input" 
+                 placeholder="Comment (required if declining)"
+                 style="padding:6px; margin-bottom:6px; width:160px;"><br>
+
+          <!-- CLEAN BUTTONS -->
+          <button name="action" value="approve" type="submit"
+           style="background:#041981; color:#04e508;">
+           Approve
+          </button>
+
+          <button name="action" value="decline" type="submit" 
+                  style="background:#041981; color:#e50404;">
+            Decline
+          </button>
+
+        </form>
+        {% else %}
+          <span style="color: gray;">✔ Processed</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% else %}
+  <div class="card" style="margin-top: 15px;">
+    <p>No requests found for: <strong>{{ selected_status }}</strong></p>
+  </div>
+{% endif %}
+
+{% endblock %}

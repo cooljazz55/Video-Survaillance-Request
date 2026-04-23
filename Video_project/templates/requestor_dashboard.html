@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Requestor Dashboard{% endblock %}
+
+{% block content %}
+
+<h1 style="margin-bottom: 5px;">My Requests</h1>
+<p style="color: gray; margin-top: 0; margin-bottom: 20px;">
+  Track your submitted footage requests and their status
+</p>
+
+<!-- ACTION BUTTONS -->
+<div class="card" style="margin-bottom: 20px;">
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    
+    <a href="{{ url_for('new_request') }}" style="text-decoration: none;">
+      <button type="button" style="background:#041981; color:white;">
+        Submit New Request
+      </button>
+    </a>
+
+    <a href="{{ url_for('logout') }}" style="text-decoration: none;">
+      <button type="button" style="background:#ddd; color:#333;">
+        Logout
+      </button>
+    </a>
+
+  </div>
+</div>
+
+{% if requests %}
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Building</th>
+      <th>Camera</th>
+      <th>Division</th>
+      <th>Job Title</th>
+      <th>Start</th>
+      <th>End</th>
+      <th>Status</th>
+      <th>Update</th>
+      <th>Director Comment</th>
+      <th>Submitted</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for r in requests %}
+    <tr>
+      <td>{{ r["id"] }}</td>
+      <td>{{ r["building"] }}</td>
+      <td>{{ r["camera_location"] }}</td>
+      <td>{{ r["division"] }}</td>
+      <td>{{ r["job_title"] }}</td>
+      <td>{{ r["start_time"] | pretty_datetime }}</td>
+      <td>{{ r["end_time"] | pretty_datetime }}</td>
+
+      <!-- STATUS -->
+      <td>
+        {% if r["status"] == "Approved" %}
+          <span style="color: #17375e; font-weight: bold;">Approved</span>
+        {% elif r["status"] == "Denied" %}
+          <span style="color: #a94442; font-weight: bold;">Denied</span>
+        {% elif r["status"] == "Completed" %}
+          <span style="color: #0b5394; font-weight: bold;">Completed</span>
+        {% else %}
+          <span style="color: #856404; font-weight: bold;">Pending</span>
+        {% endif %}
+      </td>
+
+      <!-- UPDATE STATUS -->
+      <td>
+        {% if r["status"] == "Completed" %}
+          <details>
+            <summary style="cursor: pointer;">Ready for viewing</summary>
+            <div style="margin-top: 10px;">
+              <p><strong>Technician:</strong> {{ r["technician_name"] or "-" }}</p>
+              <p><strong>Employee ID:</strong> {{ r["technician_employee_id"] or "-" }}</p>
+              <p><strong>Folder Password:</strong> {{ r["folder_password"] or "-" }}</p>
+              <p><strong>Footage Location:</strong> {{ r["footage_location"] or "-" }}</p>
+            </div>
+          </details>
+
+        {% elif r["status"] == "Approved" %}
+          <span style="color: #555;">Network team is gathering footage</span>
+
+        {% elif r["status"] == "Denied" %}
+          <span style="color: #a94442;">Request denied</span>
+
+        {% else %}
+          <span style="color: #555;">Awaiting director review</span>
+        {% endif %}
+      </td>
+
+      <td>{{ r["director_comment"] or "-" }}</td>
+      <td>{{ r["submitted_at"] | pretty_datetime }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% else %}
+  <div class="card">
+    <p>No requests yet.</p>
+  </div>
+{% endif %}
+
+{% endblock %}
