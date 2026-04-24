@@ -45,13 +45,26 @@
     <input type="text" id="job_title" name="job_title" required /><br/><br/>
 
     <label for="role">Role</label><br/>
-    <select id="role" name="role" required>
-      <option value="requestor">Employee</option>
-    </select>
-    <br/>
-    <small style="color: gray;">
-      Only employee requestor accounts can be created here. Director, technician, and admin accounts are managed internally.
-    </small>
+    {% set current_role = selected_role if selected_role else 'requestor' %}
+    {% if current_role == 'requestor' %}
+      <select id="role" name="role" required>
+        <option value="requestor" selected>Employee</option>
+      </select>
+      <br/>
+      <small style="color: gray;">
+        Only employee requestor accounts can be created here. Director and technician accounts must be created by an admin.
+      </small>
+    {% else %}
+      <select id="role" name="role" required>
+        <option value="{{ current_role }}" selected>
+          {% if current_role == 'director' %}Director{% else %}Technician{% endif %}
+        </option>
+      </select>
+      <br/>
+      <small style="color: gray;">
+        Admin-only account creation for a {{ current_role }}.
+      </small>
+    {% endif %}
     <br/><br/>
 
     <button type="submit">Create Account</button>
