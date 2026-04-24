@@ -39,6 +39,17 @@
         View All Requests
       </button>
     </a>
+    <a href="{{ url_for('create_account', role='director') }}" style="text-decoration: none;">
+      <button type="button" style="width: 100%; height: 60px; background: #041981; color: white;">
+        Create Director Account
+      </button>
+    </a>
+
+    <a href="{{ url_for('create_account', role='tech') }}" style="text-decoration: none;">
+      <button type="button" style="width: 100%; height: 60px; background: #041981; color: white;">
+        Create Tech Account
+      </button>
+    </a>
   </div>
 </div>
 
