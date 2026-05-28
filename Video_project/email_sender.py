@@ -3,7 +3,7 @@ from sendgrid.helpers.mail import Mail
 
 from db import get_db
 
-SENDGRID_API_KEY = "nuh-uh"
+SENDGRID_API_KEY = "my sendgrid account expired"
 FROM_EMAIL = "mauriciomendoza@dusty.tamiu.edu"
 
 

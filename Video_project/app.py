@@ -286,6 +286,11 @@ def create_app():
 
     @app.route("/create-account", methods=["GET", "POST"])
     def create_account():
+        selected_role = request.args.get("role", "requestor") or "requestor"
+        if selected_role not in ["requestor", "director", "tech"]:
+            selected_role = "requestor"
+        if selected_role in ["director", "tech"] and session.get("role") != "admin":
+            selected_role = "requestor"
         if request.method == "POST":
             employee_id = request.form.get("employee_id", "").strip()
             first_name = request.form.get("first_name", "").strip()
@@ -309,8 +314,10 @@ def create_app():
                 errors.append("Email is required.")
             if not password:
                 errors.append("Password is required.")
-            if role not in ["requestor", "director", "tech", "admin"]:
+            if role not in ["requestor", "director", "tech"]:
                 errors.append("A valid role is required.")
+            if role in ["director", "tech"] and session.get("role") != "admin":
+                errors.append("Only admins can create director and technician accounts.")
             if not department:
                 errors.append("Department is required.")
             if not division:
@@ -335,7 +342,7 @@ def create_app():
             if errors:
                 for e in errors:
                     flash(e, "error")
-                return render_template("create_account.html")
+                return render_template("create_account.html", selected_role=role)
 
             pw_hash = generate_password_hash(password, method="pbkdf2:sha256")
 
@@ -352,7 +359,7 @@ def create_app():
             flash("Account created successfully!", "success")
             return redirect(url_for("login"))
 
-        return render_template("create_account.html")
+        return render_template("create_account.html", selected_role=selected_role)
 
     @app.route("/logout")
     def logout():
